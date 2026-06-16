@@ -29,6 +29,7 @@ class AdminDashboard extends Component
 
     public $selectedKategori = null; 
     public $selectedPeriode = null;
+    public $global_periode; // Untuk diset oleh admin
 
     // Field Form Kuesioner
     public $nama_kategori, $deskripsi, $target_role = 'semua'; 
@@ -43,7 +44,21 @@ class AdminDashboard extends Component
         if (auth()->user()->role !== 'admin') {
             abort(403, 'Akses Ditolak.');
         }
-        $this->selectedPeriode = date('Y');
+        $this->selectedPeriode = \App\Models\SystemSetting::getActivePeriode();
+        $this->global_periode = $this->selectedPeriode;
+    }
+
+    public function saveGlobalPeriode()
+    {
+        $this->validate(['global_periode' => 'required']);
+        \App\Models\SystemSetting::updateOrCreate(
+            ['key' => 'active_periode'],
+            ['value' => $this->global_periode]
+        );
+        $this->dispatch('show-toast', [
+            'icon' => 'success',
+            'message' => 'Periode Aktif berhasil diperbarui!'
+        ]);
     }
 
     public function switchTab($tab)
