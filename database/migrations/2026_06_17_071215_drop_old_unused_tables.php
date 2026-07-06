@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::dropIfExists('pertanyaans');
         Schema::dropIfExists('kuisioners');
+        
+        if (Schema::hasTable('jawabans') && Schema::hasColumn('jawabans', 'dosen_id')) {
+            Schema::table('jawabans', function (Blueprint $table) {
+                $table->dropForeign(['dosen_id']);
+                $table->dropColumn('dosen_id');
+            });
+        }
+
         Schema::dropIfExists('dosens');
     }
 
